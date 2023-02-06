@@ -1,0 +1,47 @@
+# Contributor:
+# Maintainer:
+pkgname=mptcpkit-api
+pkgver=0.2.1
+pkgrel=1
+pkgdesc="MPTCPKIT Server API"
+url="https://github.com/mptcpkit/packages"
+arch="all"
+license="MIT"
+depends=""
+makedepends="go"
+checkdepends=""
+install="$pkgname.pre-install $pkgname.post-install"
+options="!check"
+source="
+	mptcpkit-api-$pkgver.tar.gz::https://github.com/mptcpkit/api/archive/v$pkgver.tar.gz
+	mptcpkit-api.initd
+	mptcpkit-api.confd
+	"
+builddir="$srcdir/api-$pkgver"
+
+export GOCACHE="${GOCACHE:-"$srcdir/go-cache"}"
+export GOTMPDIR="${GOTMPDIR:-"$srcdir"}"
+export GOMODCACHE="${GOMODCACHE:-"$srcdir/go"}"
+
+build() {
+	go build -o bin/mptcpkit-api
+}
+
+
+package() {
+	install -Dm755 "$builddir"/bin/mptcpkit-api "$pkgdir"/usr/bin/mptcpkit-api
+	install -Dm644 "$builddir"/config.yml "$pkgdir"/etc/mptcpkit/config.yml
+	install -Dm600 "$builddir"/keys.yml "$pkgdir"/etc/mptcpkit/keys.yml
+	mkdir -p "$pkgdir"/etc/mptcpkit/endpoints
+	cp -r "$builddir"/endpoints/* "$pkgdir"/etc/mptcpkit/endpoints/
+	install -m755 -D "$srcdir"/$pkgname.initd \
+		"$pkgdir"/etc/init.d/$pkgname
+	install -m644 -D "$srcdir"/$pkgname.confd \
+		"$pkgdir"/etc/conf.d/$pkgname
+}
+
+sha512sums="
+1d3586829af1b939a1043e89ebff50058c0997f432e79d1d5de00e91f51aece439880d61163e84a86d4b9ea3b9150b9c8de4f52ae557be75b7a0cb00d034fecd  mptcpkit-api-0.2.1.tar.gz
+b1fa8f9d60afa4430415e97fd78538c1bd7ff4286083bb71e61f4d68c0de9942da08dd555b415d5c5fb15d6d57fddbdfee45b572662f2e5fb5f60cc027825a9c  mptcpkit-api.initd
+3a125d679f532f8d19cf2c4f30bacb2cda09d684f254b106f27ce096457599819df0f1e9bcf39831fce49a1c310da5b51167b73c210591642be8c33157c9aaac  mptcpkit-api.confd
+"

@@ -1,0 +1,6 @@
+# Sample conf.d file for alpine linux
+
+#
+# Specify daemon options here.
+#
+sample_opts=""
