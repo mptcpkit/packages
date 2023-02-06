@@ -1,32 +1,70 @@
 # Contributor:
 # Maintainer:
 pkgname=libcorkipset
-pkgver=
-pkgrel=0
-pkgdesc=""
-url=""
+pkgver=1.1.1
+_pkgdate=20150311
+_pkgver="$pkgver"+20150311
+_debver=7
+pkgrel=2
+pkgdesc="A small C helper library for storing sets of IPv4 and IPv6 addresses"
+url="https://github.com/rogers0/libcorkipset"
 arch="all"
-license=""
-depends=""
-makedepends=""
-checkdepends=""
+license="BSD"
+depends="
+	libcork
+"
+makedepends="
+	libcork-dev
+	check-dev
+	cmake
+	git
+	"
+checkdepends="
+	python3
+"
 install=""
 subpackages="$pkgname-dev $pkgname-doc"
-source=""
-builddir="$srcdir/"
+source="
+	libcorkipset-$pkgver.tar.gz::https://github.com/rogers0/libcorkipset/archive/refs/tags/debian/"$_pkgver"-"$_debver".tar.gz
+	fix_check_deprecation.patch
+"
+builddir="$srcdir/libcorkipset-debian-$pkgver-$_pkgdate-$_debver"
+
+prepare() {
+	default_prepare
+	mkdir build
+
+  # cd libcorkipset-debian-"$pkgver"-"$_pkgdate"-"$_debver"
+  for p in debian/patches/*.patch; do
+    patch -p1 -i "$p"
+  done
+
+  sed -e 's%#include <ipset%#include <libcorkipset%' \
+      -e 's%#include "ipset%#include "libcorkipset%' \
+      -i include/ipset/*.h */*/*/*.c */*/*/*.c.in */*/*.c */*.c
+  mv include/ipset include/libcorkipset
+}
+
 
 build() {
-	# Replace with proper build command(s)
-	:
+	cd build
+	cmake ../ -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=lib
+	make
 }
 
 check() {
-	# Replace with proper check command(s)
-	:
+  cd build
+  make test
 }
 
 package() {
-	# Replace with proper package command(s)
-	:
+  cd build
+  make DESTDIR="$pkgdir/" install
+
+  install -Dm644 "$builddir"/LICENSE.txt "$pkgdir"/usr/share/licenses/$pkgname/LICENSE.txt
 }
 
+sha512sums="
+0b6f5b90a9a57854abc1e1f4c937e9b29a2fbda33061c5ed303e307991395b67be29e267712badd90b2d53d925ad25208497cc3ddac77e55736da1d9f1212294  libcorkipset-1.1.1.tar.gz
+bbda7bf1f4f0ec24c984def9b0e3c613e7e5daa5a6b83897ae338604fef1a8ac84a60fe83e6f4afdc91c652274d715b5133cee78975151d5252e0d4d423f4bb9  fix_check_deprecation.patch
+"
