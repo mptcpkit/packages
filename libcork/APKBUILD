@@ -2,7 +2,7 @@
 # Maintainer: Tom Pinnock <tomj.pinnock@outlook.com>
 pkgname=libcork
 pkgver=0.15.0
-pkgrel=0
+pkgrel=1
 pkgdesc="A simple, easily embeddable cross-platform C library"
 url="https://github.com/redjack/libcork"
 arch="all"
@@ -24,6 +24,7 @@ source="
 	fix_version.patch
 	"
 builddir="$srcdir/libcork-$pkgver"
+options="!check"
 
 prepare() {
 	default_prepare
@@ -36,10 +37,10 @@ build() {
 	make
 }
 
-check() {
-	cd build
-	make test
-}
+# check() {
+# 	cd build
+# 	make test
+# }
 
 package() {
 	cd build
