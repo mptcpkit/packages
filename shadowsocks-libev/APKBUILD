@@ -2,7 +2,7 @@
 # Maintainer:
 pkgname=shadowsocks-libev
 pkgver=3.3.3
-pkgrel=0
+pkgrel=2
 pkgdesc="Shadowsocks libev port"
 url="https://github.com/Ysurac/shadowsocks-libev"
 arch="all"
@@ -12,6 +12,7 @@ depends="
 	libsodium
 	c-ares
 	libev
+	pcre
 	"
 makedepends="
 	autoconf
@@ -19,16 +20,33 @@ makedepends="
 	libtool
 	asciidoc
 	xmlto
+	libcorkipset-dev
+	libbloom-dev
+	pcre-dev
+	mbedtls-dev
+	c-ares-dev
+	libev-dev
+	libsodium-dev
+	linux-headers
 	"
 checkdepends=""
 install="$pkgname.pre-install $pkgname.post-install"
-subpackages=""
+subpackages="$pkgname-dev $pkgname-doc $pkgname-openrc"
 source="
 	shadowsocks-libev-$pkgver.tar.gz::https://github.com/Ysurac/shadowsocks-libev/archive/refs/tags/v$pkgver.tar.gz
+	fix_extern.patch
 	shadowsocks-libev.initd
 	shadowsocks-libev.confd
 	"
 builddir="$srcdir/shadowsocks-libev-$pkgver"
+
+options="!check"
+
+prepare() {
+	default_prepare
+
+	sed -i 's|AC_CONFIG_FILES(\[libbloom/Makefile libcork/Makefile libipset/Makefile\])||' configure.ac
+}
 
 build() {
 	./autogen.sh
@@ -38,12 +56,10 @@ build() {
 		--prefix=/usr \
 		--sysconfdir=/etc \
 		--mandir=/usr/share/man \
-		--localstatedir=/var
+		--localstatedir=/var \
+		--enable-shared \
+		--enable-system-shared-lib 
 	make
-}
-
-check() {
-	make check
 }
 
 package() {
@@ -57,6 +73,7 @@ package() {
 
 sha512sums="
 f02b43ee95b18b0a63fae1a1ad56b4d5e41cc79dc38cd9ad71c3830b7bb97a14110299f766b1e2cfbd6ce362f4c76c338693b1d8b558cf18b9c5e53a08fddd38  shadowsocks-libev-3.3.3.tar.gz
+32e926a5cdb9de6ce76b1536343218e9f5fbe0bf08b028542e59cb7614e63a7d6770fc8d69d2509a81559fbd278d689c8a30025d6da001a074e0cc00b3b8a1aa  fix_extern.patch
 512331fd6b4c5621c14b8bf07a94b2318dc33fea245de1e66d6385e1dc4cbfde7cb0d53507b46c85a11defe65a936cca40ace80df76130c7af2ef5999899892c  shadowsocks-libev.initd
 f11f0d192cd7823307c2ce4ddc7b3fff5190f72d3f65a5524b487021a95a222aca1fd36ab1eb58ed533e7acd555bfb70f0c8a13db20338ea31527f3151fd2bd7  shadowsocks-libev.confd
 "
