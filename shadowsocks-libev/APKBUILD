@@ -1,24 +1,37 @@
 # Contributor:
 # Maintainer:
 pkgname=shadowsocks-libev
-pkgver=
+pkgver=3.3.3
 pkgrel=0
-pkgdesc=""
-url=""
+pkgdesc="Shadowsocks libev port"
+url="https://github.com/Ysurac/shadowsocks-libev"
 arch="all"
-license=""
-depends=""
-makedepends=""
+license="GPL-3.0-only	"
+depends="
+	mbedtls
+	libsodium
+	c-ares
+	libev
+	"
+makedepends="
+	autoconf
+	automake
+	libtool
+	asciidoc
+	xmlto
+	"
 checkdepends=""
 install="$pkgname.pre-install $pkgname.post-install"
-subpackages="$pkgname-dev $pkgname-doc"
+subpackages=""
 source="
+	shadowsocks-libev-$pkgver.tar.gz::https://github.com/Ysurac/shadowsocks-libev/archive/refs/tags/v$pkgver.tar.gz
 	shadowsocks-libev.initd
 	shadowsocks-libev.confd
 	"
-builddir="$srcdir/"
+builddir="$srcdir/shadowsocks-libev-$pkgver"
 
 build() {
+	./autogen.sh
 	./configure \
 		--build=$CBUILD \
 		--host=$CHOST \
@@ -43,6 +56,7 @@ package() {
 }
 
 sha512sums="
+f02b43ee95b18b0a63fae1a1ad56b4d5e41cc79dc38cd9ad71c3830b7bb97a14110299f766b1e2cfbd6ce362f4c76c338693b1d8b558cf18b9c5e53a08fddd38  shadowsocks-libev-3.3.3.tar.gz
 512331fd6b4c5621c14b8bf07a94b2318dc33fea245de1e66d6385e1dc4cbfde7cb0d53507b46c85a11defe65a936cca40ace80df76130c7af2ef5999899892c  shadowsocks-libev.initd
 f11f0d192cd7823307c2ce4ddc7b3fff5190f72d3f65a5524b487021a95a222aca1fd36ab1eb58ed533e7acd555bfb70f0c8a13db20338ea31527f3151fd2bd7  shadowsocks-libev.confd
 "

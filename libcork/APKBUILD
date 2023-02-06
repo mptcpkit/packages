@@ -1,0 +1,54 @@
+# Contributor: Tom Pinnock <tomj.pinnock@outlook.com>
+# Maintainer: Tom Pinnock <tomj.pinnock@outlook.com>
+pkgname=libcork
+pkgver=0.15.0
+pkgrel=0
+pkgdesc="A simple, easily embeddable cross-platform C library"
+url="https://github.com/redjack/libcork"
+arch="all"
+license="BSD"
+depends=""
+makedepends="
+	cmake
+	check-dev
+	git
+	"
+checkdepends="
+	check
+	python3
+	"
+install=""
+subpackages="$pkgname-dev $pkgname-doc"
+source="
+	libcork-$pkgver.tar.gz::https://github.com/dcreager/libcork/archive/refs/tags/$pkgver.tar.gz
+	fix_version.patch
+	"
+builddir="$srcdir/libcork-$pkgver"
+
+prepare() {
+	default_prepare
+	mkdir build
+}
+
+build() {
+	cd build
+	cmake ../ -DCMAKE_INSTALL_PREFIX=/usr -DCORK_VERSION="$pkgver"
+	make
+}
+
+check() {
+	cd build
+	make test
+}
+
+package() {
+	cd build
+	make DESTDIR="$pkgdir/" install
+
+	install -Dm644 "$builddir"/COPYING "$pkgdir"/usr/share/licenses/$pkgname/COPYING
+}
+
+sha512sums="
+8f41cce2101b96707068a21e5bd0a43c23f996c3620e7dd36621ed4bdd3f92851a92ea56ed92db40d7d8fe55ddfbdfcdaac4d2c8b2fc6cb3b1abe3b0e74c6a75  libcork-0.15.0.tar.gz
+5be11ebbe3d4a382776f4d9fb521f3a6f9d692db204c26dac58c0ae0289a40a01b6132eccf041523029605c64bc0c51dd0a97c8d724f6dfce513535274deb4d6  fix_version.patch
+"
